@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ongaku App</title>
+    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+</head>
+<body>
+    <div class="main_div">
+        <div class="music_container">
+            <h1 id="title">Song Name</h2>
+            <h3 id="artist">Artist Name</h3>
+            <div class="img_container">
+                <img src="./Sounds/Imagine Dragons - Evolve/Cover.jpg" id="pic">
+            </div>
+            <audio src="./Sounds/Imagine Dragons - Evolve/03. Believer.mp3"></audio>
+
+            <!-- progressbar_container -->
+            <div class="progressbar_container" id="progressbar_container">
+                <div class="progressbar_duration_meter">
+                    <div id="current_time">0.00</div>
+                    <div id="duration">2.44</div>
+                </div>
+                <div class="progress_div" id="progress_div">
+                    <div class="progress" id="progress"></div>
+                </div>
+            </div>
+
+            <!-- <div class="progressbar"></div> -->
+            <div class="music_controls">
+                <i class="fas fa-backward" id="prev"></i>
+                <i class="fas fa-play" id="play"></i>
+                <i class="fas fa-forward" id="next"></i>
+            </div>
+        </div>
+    </div>
+    <script>
+        const music=document.querySelector("audio");
+        const play = document.getElementById("play");
+        const img= document.getElementById("pic");
+        const artist = document.getElementById("artist");
+        const title = document.getElementById("title");
+        const next = document.getElementById("next");
+        const prev = document.getElementById("prev");
+        
+        let progress=document.getElementById("progress");
+        let confusing_name = document.getElementById("duration");
+        let current_time = document.getElementById("current_time");
+        const progress_div = document.getElementById('progress_div');
+
+        const songs = [
+            {
+                name: "01. Hey Angel",
+                title: "01. Hey Angel",
+                artist: "Imagine Dragons - Evolve"
+            },
+            {
+                name: "02. Whatever It Takes",
+                title: "02. Whatever It Takes",
+                artist: "Imagine Dragons - Evolve"
+            },
+            {
+                name: "03. Believer",
+                title: "03. Believer",
+                artist: "Imagine Dragons - Evolve"
+            },
+            {
+                name: "04. Walking The Wire",
+                title: "04. Walking The Wire",
+                artist: "Imagine Dragons - Evolve"
+            }
+        ]
+        
+        let isPlaying=0;
+        const playSong =  ()=>{
+           isPlaying=1;
+           music.play();
+           play.classList.replace("fa-play", "fa-pause");
+           img.classList.add("anime");
+        };
+
+        const pauseSong = ()=>{
+           isPlaying=0;
+           music.pause();
+           play.classList.replace("fa-pause", "fa-play");
+           img.classList.remove("anime");
+        };
+        
+        //Play pause functionality
+        play.addEventListener('click', ()=>{
+            if(isPlaying){
+                pauseSong();
+            }
+            else{
+                playSong();
+            }
+        });
+
+        //Changing music data
+        const loadSong = (songs)=> {
+            title.textContent = songs.title;
+            artist.textContent = songs.artist;
+            music.src = "./Sounds/Imagine Dragons - Evolve/" + songs.name + ".mp3";
+            img.src = "./Sounds/Imagine Dragons - Evolve/Cover.jpg";
+        };
+
+        // loadSong(songs[1]);
+
+        let songIndex=0;
+
+        const nextSong = ()=>{
+            songIndex =(songIndex + 1)% songs.length;
+
+            loadSong(songs[songIndex]);
+            playSong();
+        }
+
+        const prevSong = ()=>{
+            songIndex =(songIndex - 1 + songs.length) % songs.length;
+
+            loadSong(songs[songIndex]);
+            playSong();
+        }
+
+
+        music.addEventListener("timeupdate", (event)=>{
+            // console.log(event);
+            const {currentTime, duration} = event.srcElement;
+            // console.log(currentTime);
+            // console.log(duration);
+
+            let progress_time= (currentTime/duration)*100;
+            progress.style.width = `${progress_time}%`;
+
+            //music duration  update
+
+            let min_duration = Math.floor(duration / 60);
+            let sec_duration = Math.floor(duration % 60);
+
+            let tot_duration = `${min_duration}:${sec_duration}`;
+            if(duration) {
+                confusing_name.textContent = `${tot_duration}`;
+            }
+
+            //current duration  update
+
+            let min_currentTime = Math.floor(currentTime / 60);
+            let sec_currentTime = Math.floor(currentTime % 60);
+
+            if(sec_currentTime < 10){
+                sec_currentTime = `0${sec_currentTime}`;
+            }
+            let tot_currentTime = `${min_currentTime}:${sec_currentTime}`;
+            if(currentTime) {
+                current_time.textContent = `${tot_currentTime}`;
+            }
+
+        });
+
+        progress_div.addEventListener('click', (event)=>{
+
+            console.log(event);
+            const { duration } = music;
+
+            let move_progress = (event.offsetX/ event.srcElement.clientWidth) * duration;
+            console.log(move_progress);
+
+            music.currentTime = move_progress;
+        })
+
+        music.addEventListener("ended", nextSong);
+
+        next.addEventListener('click', nextSong);
+        prev.addEventListener('click', prevSong);
+
+    </script>
+
+</body>
+</html>
